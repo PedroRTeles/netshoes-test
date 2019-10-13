@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Gist(
     @SerializedName("url")
-    val url: String = "",
+    val url: String,
     @SerializedName("owner")
-    val owner: Owner = Owner()
+    val owner: Owner
 )

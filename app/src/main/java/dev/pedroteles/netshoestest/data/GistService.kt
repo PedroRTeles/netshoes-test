@@ -6,6 +6,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface GistService {
-    @GET("gist/public")
+    @GET("gists/public")
     fun list(@Query("page") page: Int) : Call<List<Gist>>
 }
