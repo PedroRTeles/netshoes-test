@@ -19,6 +19,11 @@ class ListActivity : AppCompatActivity(), RecyclerViewClickListener {
 
     private val viewModel = ListViewModel()
     private val gistList: MutableList<Gist> = mutableListOf()
+    private var currentPage = 0
+    private var isLoading = false
+    private lateinit var observer: Observer<List<Gist>>
+    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var adapter: GistAdapter
     private lateinit var rcvGists: RecyclerView
     private lateinit var pgbList: ProgressBar
 
@@ -27,12 +32,30 @@ class ListActivity : AppCompatActivity(), RecyclerViewClickListener {
         setContentView(R.layout.activity_list)
 
         findViews()
+        setupRecyclerView()
+        setupObserver()
+        requestList()
+    }
 
-        viewModel.getList(0).observe(this, Observer<List<Gist>> { list ->
+    private fun requestList() {
+        if(!isLoading) {
+            isLoading = true
+            viewModel.getList(currentPage).observe(this, observer)
+        }
+    }
+
+    private fun setupObserver() {
+        observer = Observer {
             showList()
-            gistList.addAll(list)
-            setupRecyclerView(list)
-        })
+            isLoading = false
+            currentPage++
+            handleResult(it)
+        }
+    }
+
+    private fun handleResult(list: List<Gist>) {
+        gistList.addAll(list)
+        adapter.notifyDataSetChanged()
     }
 
     private fun showList() {
@@ -53,8 +76,25 @@ class ListActivity : AppCompatActivity(), RecyclerViewClickListener {
         pgbList = findViewById(R.id.pgbList)
     }
 
-    private fun setupRecyclerView(list: List<Gist>) {
-        rcvGists.layoutManager = LinearLayoutManager(this)
-        rcvGists.adapter = GistAdapter(list, this, this)
+    private fun setupRecyclerView() {
+        layoutManager = LinearLayoutManager(this)
+        adapter = GistAdapter(gistList, this, this)
+
+        rcvGists.layoutManager = layoutManager
+        rcvGists.adapter = adapter
+
+        rcvGists.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val visibleItemCount = layoutManager.childCount
+                val pastVisibleItem = layoutManager.findFirstCompletelyVisibleItemPosition()
+                val total = adapter.itemCount
+
+                if(visibleItemCount + pastVisibleItem > total) {
+                    requestList()
+                }
+            }
+        })
     }
 }
