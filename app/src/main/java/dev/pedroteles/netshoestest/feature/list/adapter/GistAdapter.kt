@@ -1,19 +1,16 @@
 package dev.pedroteles.netshoestest.feature.list.adapter
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.AsyncTask
-import androidx.constraintlayout.widget.ConstraintLayout
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import dev.pedroteles.netshoestest.R
 import dev.pedroteles.netshoestest.`interface`.RecyclerViewClickListener
+import dev.pedroteles.netshoestest.data.DownloadImageTask
 import dev.pedroteles.netshoestest.model.Gist
 import kotlinx.android.synthetic.main.list_layout.view.*
 
@@ -44,26 +41,5 @@ class GistAdapter(private val gists: List<Gist>,
         val cstItem: ConstraintLayout = itemView.cstItem
         val imgGist: ImageView = itemView.imgGist
         val txtOwnerName: TextView = itemView.txtOwnerName
-    }
-
-    class DownloadImageTask(internal var bmImage: ImageView) : AsyncTask<String, Void, Bitmap>() {
-
-        override fun doInBackground(vararg urls: String): Bitmap? {
-            val urldisplay = urls[0]
-            var mIcon11: Bitmap? = null
-            try {
-                val `in` = java.net.URL(urldisplay).openStream()
-                mIcon11 = BitmapFactory.decodeStream(`in`)
-            } catch (e: Exception) {
-                Log.e("Error", e.message)
-                e.printStackTrace()
-            }
-
-            return mIcon11
-        }
-
-        override fun onPostExecute(result: Bitmap) {
-            bmImage.setImageBitmap(result)
-        }
     }
 }

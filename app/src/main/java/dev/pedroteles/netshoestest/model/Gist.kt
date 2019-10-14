@@ -7,5 +7,7 @@ data class Gist(
     @SerializedName("url")
     val url: String,
     @SerializedName("owner")
-    val owner: Owner
+    val owner: Owner,
+    @SerializedName("description")
+    val description: String
 ) : Serializable
